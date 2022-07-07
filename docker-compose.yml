@@ -17,14 +17,19 @@ services:
     depends_on:
       - pgdb
       - redis
+    networks:
+      - drc
   celery:
     build: .
+    container_name: celery
     command: celery -A djangoRedisCelery worker -l INFO
     volumes:
       - .:/usr/src/app
     depends_on:
       - django
       - redis
+    networks:
+      - drc
   pgdb:
     image: postgres
     container_name: pgdb
@@ -34,7 +39,15 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - pgdata:/var/lib/postgresql/data/
+    networks:
+      - drc
   redis:
     image: "redis:alpine"
+    container_name: redis
+    networks:
+      - drc
 volumes:
   pgdata:
+networks:
+  drc:
+    driver: bridge
